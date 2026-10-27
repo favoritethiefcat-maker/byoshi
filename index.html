@@ -103,17 +103,17 @@ var MM='https://c.cocacola.co.jp/spn/mmaid/cp/2026juice/iw.htm?O5d=',GE='https:/
 var GROUPS=[
  {g:'ミニッツメイド・Qoo',o:'23:59:59.955',items:[
   {n:'Coke ON ドリンクチケット',p:1,u:MM+29,multi:1},{n:'Qoo サイコロクッション',p:3,u:MM+30},{n:'スイーツカタログギフト',p:3,u:MM+31},{n:'Qoo カプセルマシン',p:8,u:MM+32},{n:'Toffy オーブントースター＋プレート',p:8,u:MM+33}]},
- {g:'ジョージア（ジョジョ コラボ）',o:'23:59:59.955',items:[
+ {g:'ジョージア（ジョジョ コラボ）',o:'00:00:01.955',tg:'00:00:02.000',items:[
   {n:'Coke ON ドリンクチケット',p:1,u:GE+1,multi:1},{n:'タンブラー ジョニィ・ジョースター',p:5,u:GE+2},{n:'タンブラー ジャイロ・ツェペリ',p:5,u:GE+3},{n:'タンブラー ディエゴ・ブランドー',p:5,u:GE+4},{n:'タンブラー ルーシー・スティール',p:5,hl:1,u:GE+5},{n:'タンブラー ジョナサン・ジョースター',p:5,u:GE+6},{n:'タンブラー ジョセフ・ジョースター',p:5,hl:1,u:GE+7},{n:'タンブラー 空条承太郎',p:5,hl:1,u:GE+8},{n:'タンブラー 東方仗助',p:5,u:GE+9},{n:'タンブラー ジョルノ・ジョバァーナ',p:5,u:GE+10},{n:'タンブラー 空条徐倫',p:5,hl:1,u:GE+11},{n:'コラボウォームジャケット',p:10,u:GE+12}]}
 ];
 // ▼ 代表の方へ：全員の一覧から消したい賞品の名前を、下の [ ] の中に '名前' の形でカンマ区切りで書いてください（例：var HIDE=['タンブラー 空条徐倫','Qoo カプセルマシン'];）
 var HIDE=[];
 (function(){
  function g(k,v){try{var s=localStorage.getItem(k);return s?JSON.parse(s):v;}catch(e){return v;}}
- var GH=g('byoshi_ghide',[]);var MYH=g('byoshi_hide',[]).concat(GH);var ALLG=GROUPS.map(function(gr){return {g:gr.g,o:gr.o,items:gr.items.filter(function(it){return HIDE.indexOf(it.n)<0;})};}).filter(function(gr){return gr.items.length;});var VIS=ALLG.map(function(gr){return {g:gr.g,o:gr.o,items:gr.items.filter(function(it){return MYH.indexOf(it.u)<0;})};}).filter(function(gr){return gr.items.length;});if(!VIS.length){VIS=ALLG;}
- var sel=g('byoshi_sel',''),all=[];VIS.forEach(function(gr){gr.items.forEach(function(it){all.push({u:it.u,n:it.n,s:gr.g,o:gr.o});});});g('byoshi_custom',[]).forEach(function(it){all.push({u:it.u,n:it.n,s:''});});
+ var GH=g('byoshi_ghide',[]);var MYH=g('byoshi_hide',[]).concat(GH);var ALLG=GROUPS.map(function(gr){return {g:gr.g,o:gr.o,tg:gr.tg,items:gr.items.filter(function(it){return HIDE.indexOf(it.n)<0;})};}).filter(function(gr){return gr.items.length;});var VIS=ALLG.map(function(gr){return {g:gr.g,o:gr.o,tg:gr.tg,items:gr.items.filter(function(it){return MYH.indexOf(it.u)<0;})};}).filter(function(gr){return gr.items.length;});if(!VIS.length){VIS=ALLG;}
+ var sel=g('byoshi_sel',''),all=[];VIS.forEach(function(gr){gr.items.forEach(function(it){all.push({u:it.u,n:it.n,s:gr.g,o:gr.o,tg:gr.tg});});});g('byoshi_custom',[]).forEach(function(it){all.push({u:it.u,n:it.n,s:''});});
  var cur=null;for(var i=0;i<all.length;i++){if(all[i].u===sel){cur=all[i];}}if(!cur){cur=all[0];}
- RUN({db:DB,t:cur.o||'00:00:00.000',g:'00:00:00.000',u:cur.u,n:(cur.s?cur.s+' ':'')+cur.n,off:0,groups:VIS,allGroups:ALLG,gh:GH});
+ RUN({db:DB,t:cur.o||'00:00:00.000',g:cur.tg||'00:00:00.000',u:cur.u,n:(cur.s?cur.s+' ':'')+cur.n,off:0,groups:VIS,allGroups:ALLG,gh:GH});
  (function(){try{fetch(DB+'/cfg/hide.json',{cache:'no-store'}).then(function(r){return r.json();}).then(function(j){var nu=((j&&j.u)||[]).filter(function(x){return x!=='_';});if(JSON.stringify(nu.slice().sort())!==JSON.stringify(GH.slice().sort())){localStorage.setItem('byoshi_ghide',JSON.stringify(nu));location.reload();}}).catch(function(){});}catch(e){}})();
 })();
 </script>
