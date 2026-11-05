@@ -12,7 +12,7 @@ function wheel(n,cls){var cp=Math.max(5,Math.ceil(240/n));if(cp%2===0)cp++;var b
 function lbl(t){var s=document.createElement('span');s.className='wl';s.textContent=t;$('w').appendChild(s);}
 wheel(24);lbl('時');wheel(60);lbl('分');wheel(6,'d');wheel(10,'d');lbl('秒');lbl('.');wheel(10,'d');wheel(10,'d');wheel(10,'d');
 function setT(h,m,s,ms){W[0].set(h);W[1].set(m);W[2].set(Math.floor(s/10));W[3].set(s%10);W[4].set(Math.floor(ms/100));W[5].set(Math.floor(ms/10)%10);W[6].set(ms%10);}
-function getT(){var x=new Date(T());x.setHours(W[0].v,W[1].v,W[2].v*10+W[3].v,W[4].v*100+W[5].v*10+W[6].v);return x.getTime();}
+var nextD=false;function getT(){var x=new Date(T());x.setHours(W[0].v,W[1].v,W[2].v*10+W[3].v,W[4].v*100+W[5].v*10+W[6].v);var v=x.getTime();nextD=false;if(v<T()-3e5){v+=864e5;nextD=true;}return v;}
 function ls(k,v){try{if(v===undefined){return JSON.parse(localStorage.getItem(k));}localStorage.setItem(k,JSON.stringify(v));}catch(e){return null;}}
 var lastR=ls(LK);
 function rline(){if(lastR&&lastR.at){$('lr').textContent='前回押した時刻 '+fm(lastR.at)+'（目標 '+fm(lastR.tgt)+'、早め '+lastR.adv+'ms'+(lastR.ow!=null?'、片道の目安 '+lastR.ow+'ms':'')+'）'+(lastR.res?' → '+lastR.res:'');}$('rs').className='r'+(lastR&&lastR.at&&!lastR.res?'':' hid');}
@@ -51,6 +51,6 @@ $('x').onclick=function(){clearTimeout(timer);done=true;btn(false,'予約');host
 $('g').onclick=async function(){if(!find()){say('「'+KW+'」ボタンが見つかりません。応募画面を開いてから予約してください。');return;}
 btn(true,'予約中');say('時刻と遅れを測っています…');await sync();var tg0=getT(),pp0=patTxt(tg0);$('pl').textContent=pp0.t;if(!edited){var m0=await meas();if(m0){var b0=baseAdv(m0.ow,pp0);$('ad').value=b0.adv;$('pl').textContent=pp0.t+'\n'+b0.t;}}var adv=Math.max(0,parseInt(String($('ad').value).replace(/[^\d]/g,''))||0);tgt=getT();var go=tgt-adv;if(go<T()-1000){btn(false,'予約');say('その時刻はもう過ぎています。');return;}
 try{if(navigator.wakeLock){navigator.wakeLock.request('screen').catch(function(){});}}catch(e){}
-clearTimeout(timer);done=false;say(note+'。'+fm(go)+' に押します（目標 '+fm(tgt)+'、早め '+adv+'ms）。画面を閉じず、このまま待ってください。押したあとは画面が切り替わるので、時刻は次に開いたとき「前回」に出ます。');
+clearTimeout(timer);done=false;say(note+'。'+fm(go)+' に押します（目標 '+(nextD?'明日 ':'')+fm(tgt)+'、早め '+adv+'ms）。画面を閉じず、このまま待ってください。押したあとは画面が切り替わるので、時刻は次に開いたとき「前回」に出ます。');
 btn(true,'予約中');timer=setTimeout(async function(){if(done)return;await sync();if(!edited&&go-T()>3000){var m1=await meas();if(m1){var pp1=patTxt(tgt),b1=baseAdv(m1.ow,pp1);$('ad').value=b1.adv;adv=b1.adv;go=tgt-adv;$('pl').textContent=pp1.t+'\n'+b1.t;}}var w=go-T()-40;if(T()-go>300){btn(false,'予約');say('時刻に遅れたため押しませんでした。');return;}if(w>0){await new Promise(function(r){setTimeout(r,w);});}if(done)return;while(T()<go){}var b=find();if(!b){btn(false,'予約');say('ボタンが見つからず押せませんでした。');return;}done=true;var at=T();var q=new URLSearchParams(location.search).get('c'),bs=location.origin+location.pathname;var rec={id:Math.random().toString(36).slice(2,10)+at.toString(36),at:at,go:go,tgt:tgt,adv:adv,ow:ow,rtt:ow==null?null:ow*2,off:off,res:null,ck:q?bs+'?c=':bs,u:q?bs+'?c='+q:bs};ls(LK,rec);ls(HK,(ls(HK)||[]).concat([rec]).slice(-30));lastR=rec;b.click();rline();btn(false,'押しました');say('押しました：'+fm(at)+'（目標 '+fm(tgt)+'）');},Math.max(0,go-T()-20000));};
 window.__byo={show:function(){host.style.display='block';}};})();
